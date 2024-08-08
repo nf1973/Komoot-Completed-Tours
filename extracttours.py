@@ -1,6 +1,6 @@
 import sys
 from time import sleep
-from classes.tour import Tour
+from models.tour import Tour
 from utils.auth_utils import has_cookie_expired
 from utils.http_utils import set_headers, extract_tours
 from utils.file_utils import get_connection_data, get_existing_tour_ids, write_tours_to_file
