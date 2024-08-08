@@ -22,8 +22,13 @@ def remap_sport(sport):
     return SPORT_REMAPPING.get(sport, sport)
 
 # Load JSON data
-with open('tours.json', 'r') as file:
-    data = json.load(file)
+try:
+    with open('tours.json', 'r') as file:
+        data = json.load(file)
+except FileNotFoundError:
+    print("Error: tours.json file not found - did you already run extracttours.py?")
+    exit()
+    
 
 tours = data['completed_tours']
 
@@ -56,7 +61,7 @@ monthly_df = pd.DataFrame([
 ]).sort_values(by='Month')
 
 # Print the overall monthly stats
-print("Monthly Summary:")
+print("Monthly Summary (all sports):")
 print(monthly_df.to_string(index=False))
 
 # Print individual sport tables
