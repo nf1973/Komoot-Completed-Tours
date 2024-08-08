@@ -1,25 +1,9 @@
 import sys
 from time import sleep
-from datetime import datetime
-
-from tour import Tour
-from http_utils import set_headers, extract_tours
-from file_utils import get_connection_data, get_existing_tour_ids, write_tours_to_file
-
-def has_cookie_expired(cookie: str) -> bool:
-    expire = int(extract_expiration_timestamp(cookie))
-    expire_seconds = expire / 1000
-    expiration_date = datetime.fromtimestamp(expire_seconds)
-    return expiration_date < datetime.now()
-
-def extract_expiration_timestamp(cookie: str) -> str:
-    expire_str = '&expire='
-    start_pos = cookie.find(expire_str)
-    if start_pos == -1:
-        raise ValueError("Expiration timestamp not found in cookie string")
-    # Extract the substring from '&expire=' to the end
-    expire_substring = cookie[start_pos + len(expire_str):]
-    return expire_substring
+from classes.tour import Tour
+from utils.auth_utils import has_cookie_expired
+from utils.http_utils import set_headers, extract_tours
+from utils.file_utils import get_connection_data, get_existing_tour_ids, write_tours_to_file
    
 if __name__ == "__main__":
     
