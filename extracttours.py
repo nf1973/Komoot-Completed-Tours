@@ -9,8 +9,9 @@ import json
 class Tour:
     def __init__(self, tour: dict):
         self.tour_id = tour['id']
-        self.date = self._extract_date_from_iso(tour['date'])
-        self.time = self._extract_time_from_iso(tour['date'])
+        dt = self._extract_datetime_from_iso(tour['date'])
+        self.date = dt.strftime('%Y-%m-%d')
+        self.time = dt.strftime('%H:%M:%S')
         self.distance = self._format_distance(tour['distance'])
         self.name = tour['name']
         self.start_lat = tour['start_point']['lat']
@@ -26,15 +27,9 @@ class Tour:
         map_image = tour.get('vector_map_image', {}).get('src') or tour.get('map_image', {}).get('src')
         self.map_url = self._remove_query_parameters(map_image)
         self.tour_url = f"https://www.komoot.com/tour/{self.tour_id}"
-
-
-    def _extract_date_from_iso(self, iso_string: str) -> str:
-        dt = datetime.fromisoformat(iso_string.replace("Z", "+00:00"))
-        return dt.strftime('%Y-%m-%d')
-
-    def _extract_time_from_iso(self, iso_string: str) -> str:
-        dt = datetime.fromisoformat(iso_string.replace("Z", "+00:00"))
-        return dt.strftime('%H:%M:%S')
+    
+    def _extract_datetime_from_iso(self, iso_string: str) -> datetime:
+        return datetime.fromisoformat(iso_string.replace("Z", "+00:00"))
 
     def _format_distance(self, distance: str) -> float:
         return math.floor(int(distance) / 100) / 10
