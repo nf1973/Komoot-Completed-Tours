@@ -7,11 +7,11 @@ import math
 import json
 
 class Tour:
-    def __init__(self, tour):
+    def __init__(self, tour: dict):
         self.tour_id = tour['id']
-        self.date = self.extract_date_from_iso(tour['date'])
-        self.time = self.extract_time_from_iso(tour['date'])
-        self.distance = self.format_distance(tour['distance'])
+        self.date = self._extract_date_from_iso(tour['date'])
+        self.time = self._extract_time_from_iso(tour['date'])
+        self.distance = self._format_distance(tour['distance'])
         self.name = tour['name']
         self.start_lat = tour['start_point']['lat']
         self.start_lng = tour['start_point']['lng']
@@ -24,25 +24,25 @@ class Tour:
         
         # Check for 'vector_map_image' first, and use 'map_image' if it doesn't exist
         map_image = tour.get('vector_map_image', {}).get('src') or tour.get('map_image', {}).get('src')
-        self.map_url = self.remove_query_parameters(map_image)
+        self.map_url = self._remove_query_parameters(map_image)
         self.tour_url = f"https://www.komoot.com/tour/{self.tour_id}"
 
 
-    def extract_date_from_iso(self, iso_string):
+    def _extract_date_from_iso(self, iso_string: str) -> str:
         dt = datetime.fromisoformat(iso_string.replace("Z", "+00:00"))
         return dt.strftime('%Y-%m-%d')
 
-    def extract_time_from_iso(self, iso_string):
+    def _extract_time_from_iso(self, iso_string: str) -> str:
         dt = datetime.fromisoformat(iso_string.replace("Z", "+00:00"))
         return dt.strftime('%H:%M:%S')
 
-    def format_distance(self, distance):
+    def _format_distance(self, distance: str) -> float:
         return math.floor(int(distance) / 100) / 10
     
-    def remove_query_parameters(self, url):
+    def _remove_query_parameters(self, url: str) -> str:
         return url.split('?')[0]
 
-    def to_dict(self):
+    def _to_dict(self: 'Tour') -> dict:
         return {
             'id': self.tour_id,
             'date': self.date,
@@ -61,7 +61,7 @@ class Tour:
             'tour_url': self.tour_url
         }
 
-def get_existing_tour_ids(filename):
+def get_existing_tour_ids(filename: str) -> list:
     if os.path.exists(filename):
         with open("tours.json", "r", encoding="utf-8") as f:
             existing_tours = json.load(f).get("completed_tours", [])
@@ -71,7 +71,7 @@ def get_existing_tour_ids(filename):
     else:
         return []
 
-def set_headers(user_id, cookie):
+def set_headers(user_id: str, cookie: str) -> dict:
     return {
         "Accept": "application/hal+json,application/json",
         "Accept-Encoding": "gzip, deflate, br, zstd",
@@ -89,20 +89,20 @@ def set_headers(user_id, cookie):
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.142.86 Safari/537.36"
         }
 
-def get_connection_data(f,prompt):
+def get_connection_data(f: str,prompt: str) -> str:
     if os.path.exists(f):
         with open(f,'r') as file:
             return file.read().rstrip('\n')
     else:
         return input(prompt)
 
-def has_cookie_expired(cookie):
+def has_cookie_expired(cookie: str) -> bool:
     expire = int(extract_expiration_timestamp(cookie))
     expire_seconds = expire / 1000
     expiration_date = datetime.fromtimestamp(expire_seconds)
     return expiration_date < datetime.now()
 
-def extract_expiration_timestamp(cookie):
+def extract_expiration_timestamp(cookie: str) -> str:
     expire_str = '&expire='
     start_pos = cookie.find(expire_str)
     if start_pos == -1:
@@ -112,7 +112,7 @@ def extract_expiration_timestamp(cookie):
     return expire_substring
 
 
-def display_response_code_text(status_code, text):
+def display_response_code_text(status_code: int, text: str) -> None:
     if status_code == 401:
         print(f"401 Unauthorized: Check your authentication credentials.")
     elif status_code == 403:
@@ -123,7 +123,7 @@ def display_response_code_text(status_code, text):
         print(f"Error {status_code}: {text}")
     sys.exit(1)
 
-def extract_tours(headers, user_id, cookie, page_num):
+def extract_tours(headers: dict, user_id: str, page_num: int) -> list:
     url = f"https://www.komoot.com/api/v007/users/{user_id}/tours/"
     params = {
         'sport_types': '',
@@ -147,11 +147,7 @@ def extract_tours(headers, user_id, cookie, page_num):
         except Exception as e:
             return []
    
-# def write_tours_to_file(all_objects, filename, root_object):
-#     with open(filename, 'w', encoding='utf-8') as f:
-#         json.dump({root_object: [obj.__dict__ for obj in all_objects]}, f, ensure_ascii=False, indent=4)
-
-def write_tours_to_file(all_objects, filename, root_object):
+def write_tours_to_file(all_objects: list, filename: str, root_object: str) -> None:
     # Load existing data if the file already exists
     if os.path.exists(filename):
         with open(filename, 'r', encoding='utf-8') as f:
@@ -195,7 +191,7 @@ if __name__ == "__main__":
 
         while not already_got_last_page:
             sleep(delay) # Add delay to avoid risk of rate limiting
-            extracted_tours = extract_tours(headers, user_id, cookie, page_num)
+            extracted_tours = extract_tours(headers, user_id, page_num)
             page_num += 1
 
             if extracted_tours: 
