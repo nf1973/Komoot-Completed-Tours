@@ -1,5 +1,6 @@
 import os
 import json
+import tempfile
 
 
 def get_connection_data(f: str,prompt: str) -> str:
@@ -20,6 +21,7 @@ def get_existing_tour_ids(filename: str) -> list:
         return []
     
 def write_tours_to_file(all_objects: list, filename: str, root_object: str) -> None:
+    """Writes tour data to a file using atomic write operations."""
     # Load existing data if the file already exists
     if os.path.exists(filename):
         with open(filename, 'r', encoding='utf-8') as f:
@@ -36,6 +38,11 @@ def write_tours_to_file(all_objects: list, filename: str, root_object: str) -> N
     else:
         existing_data[root_object] = [obj.__dict__ for obj in all_objects]
 
-    # Write the updated data back to the file
-    with open(filename, 'w', encoding='utf-8') as f:
-        json.dump(existing_data, f, ensure_ascii=False, indent=4)
+    # Use a temporary file to perform atomic write
+    dir_name = os.path.dirname(filename)
+    with tempfile.NamedTemporaryFile('w', dir=dir_name, delete=False, encoding='utf-8') as tmp_file:
+        json.dump(existing_data, tmp_file, ensure_ascii=False, indent=4)
+        temp_file_name = tmp_file.name
+
+    # Rename the temporary file to the final filename
+    os.replace(temp_file_name, filename)
