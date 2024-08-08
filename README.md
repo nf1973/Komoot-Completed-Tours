@@ -46,4 +46,10 @@ python3 extracttours.py
 
 - If you delete `tours.json` it will be recreated with all tours the next time you run the script.
 
+### 4. Analyze your tours
+
+An example analysis script `analysis_example.py` is included, which will show a monthly summary of your extracted tours.
+
+Feel free to adapt this so suit your needs. Enjoy!
+
 If you run into any issues, please report in the Issues Section of the repository at https://github.com/nf1973/Komoot-Completed-Tours
