@@ -2,6 +2,7 @@ import httpx
 import sys
 
 def set_headers(user_id: str, cookie: str) -> dict:
+    """Set headers for the HTTP requests."""
     return {
         "Accept": "application/hal+json,application/json",
         "Accept-Encoding": "gzip, deflate, br, zstd",
@@ -20,6 +21,7 @@ def set_headers(user_id: str, cookie: str) -> dict:
         }
 
 def extract_tours(headers: dict, user_id: str, page_num: int) -> list:
+    """Extract tours from the API."""
     url = f"https://www.komoot.com/api/v007/users/{user_id}/tours/"
     params = {
         'sport_types': '',
@@ -44,6 +46,7 @@ def extract_tours(headers: dict, user_id: str, page_num: int) -> list:
             return []
         
 def display_response_code_text(status_code: int, text: str) -> None:
+    """Display the status code and text of an HTTP response."""
     if status_code == 401:
         print(f"401 Unauthorized: Check your authentication credentials.")
     elif status_code == 403:

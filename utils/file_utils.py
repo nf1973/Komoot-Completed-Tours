@@ -4,6 +4,7 @@ import tempfile
 
 
 def get_connection_data(f: str,prompt: str) -> str:
+    """Get connection data from a file or prompt the user for input."""
     if os.path.exists(f):
         with open(f,'r') as file:
             return file.read().rstrip('\n')
@@ -11,6 +12,7 @@ def get_connection_data(f: str,prompt: str) -> str:
         return input(prompt)
     
 def get_existing_tour_ids(filename: str) -> list:
+    """Get a list of tour IDs from an existing file."""
     if os.path.exists(filename):
         with open("tours.json", "r", encoding="utf-8") as f:
             existing_tours = json.load(f).get("completed_tours", [])
